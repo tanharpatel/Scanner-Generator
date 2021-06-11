@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:scanner_generator/Utils/LanguageModifier.dart';
-import 'package:scanner_generator/Utils/SharedPref.dart';
 import 'package:scanner_generator/Utils/ThemeModifier.dart';
 import 'package:scanner_generator/Utils/ViewModifier.dart';
 
@@ -53,7 +52,6 @@ class _SettingsState extends State<Settings> {
                             _theme = ThemeMode.light;
                             Provider.of<ThemeModifier>(context, listen: false).setTheme(ThemeType.Light);
                           });
-                          setTheme("light");
                         },
                       ),
                       ListTile(
@@ -65,7 +63,6 @@ class _SettingsState extends State<Settings> {
                             _theme = ThemeMode.dark;
                             Provider.of<ThemeModifier>(context, listen: false).setTheme(ThemeType.Dark);
                           });
-                          setTheme("dark");
                         },
                       ),
                       ListTile(
@@ -77,7 +74,6 @@ class _SettingsState extends State<Settings> {
                             _theme = ThemeMode.system;
                             Provider.of<ThemeModifier>(context, listen: false).setTheme(ThemeType.System);
                           });
-                          setTheme("system");
                         },
                       ),
                     ],

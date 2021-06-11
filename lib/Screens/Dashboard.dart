@@ -1,34 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:scanner_generator/Screens/ScanImage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:scanner_generator/Components/Card.dart';
-import 'package:scanner_generator/Components/GridCard.dart';
-import 'package:scanner_generator/Components/ListCard.dart';
-import 'package:scanner_generator/Utils/SharedPref.dart';
+import 'package:scanner_generator/Components/gridDashboard.dart';
+import 'package:scanner_generator/Components/listDashboard.dart';
 import 'package:scanner_generator/Utils/ViewModifier.dart';
-import 'package:scanner_generator/Screens/GenerateFromFile.dart';
-import 'package:scanner_generator/Screens/ScannerGenerator.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:scanner_generator/Screens/Scanner.dart';
 import 'package:scanner_generator/Screens/Settings.dart';
-import 'package:scanner_generator/Screens/UniversalScanner.dart';
 
 class Dashboard extends StatefulWidget {
   static final String id = "Dashboard";
-
   @override
   _DashboardState createState() => _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
-  @override
-  void initState() {
-    getTheme();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -67,8 +51,8 @@ class _DashboardState extends State<Dashboard> {
                   ),
                   Expanded(
                     child: Provider.of<ViewModifier>(context).currentView == ViewType.List
-                      ? listDashboard()
-                      : gridDashboard(),
+                      ? listDashboard(context)
+                      : gridDashboard(context),
                   )
                 ],
               ),
@@ -85,47 +69,6 @@ class _DashboardState extends State<Dashboard> {
           ),
         ),
       ),
-    );
-  }
-
-  gridDashboard() {
-    return ListView(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            gridCard(FontAwesomeIcons.questionCircle, "Don't know type of Code", context, UniversalScanner()),
-            gridCard(FontAwesomeIcons.image, "Scan Code from Image", context, ScanImage()),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            gridCard(Icons.qr_code, "QR Code", context, ScannerGenerator(codeType: "QR Code", codeId: "qrcode")),
-            gridCard(FontAwesomeIcons.barcode, "Barcode", context, ScannerGenerator(codeId: "upcA", codeType: "Barcode")),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            gridCard(FontAwesomeIcons.barcode, "Generate QR Code and Save to PDF", context, GenerateFromFile(codeId: "qrCode", codeType: "QR Code")),
-            gridCard(FontAwesomeIcons.barcode, "Generate Barcode and Save to PDF", context, GenerateFromFile(codeId: "upcA", codeType: "Barcode")),
-          ],
-        ),
-      ],
-    );
-  }
-
-  listDashboard() {
-    return ListView(
-      children: [
-        rightListCard(FontAwesomeIcons.questionCircle, "Don't know type of Code", context, UniversalScanner()),
-        leftListCard(FontAwesomeIcons.image, "Scan Code from Image", context, ScanImage()),
-        rightListCard(Icons.qr_code, "QR Code", context, ScannerGenerator(codeType: "QR Code", codeId: "qrcode")),
-        leftListCard(FontAwesomeIcons.barcode, "Barcode", context, ScannerGenerator(codeId: "upcA", codeType: "Barcode")),
-        rightListCard(FontAwesomeIcons.barcode, "Generate QR Code and Save to PDF", context, GenerateFromFile(codeId: "qrCode", codeType: "QR Code")),
-        leftListCard(FontAwesomeIcons.barcode, "Generate Barcode and Save to PDF", context, GenerateFromFile(codeId: "upcA", codeType: "Barcode")),
-      ],
     );
   }
 }

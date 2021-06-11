@@ -1,18 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
-import 'package:scanner_generator/Components/BarcodeConf.dart';
 import 'package:scanner_generator/Screens/Dashboard.dart';
-import 'package:scanner_generator/Screens/GenerateBarcode.dart';
-import 'package:scanner_generator/Screens/GenerateBatchBarcode.dart';
-import 'package:scanner_generator/Screens/NewGenerator.dart';
-import 'package:scanner_generator/Screens/ScanBarcode.dart';
 import 'package:scanner_generator/Screens/ScanImage.dart';
-import 'package:scanner_generator/Screens/ScanQR.dart';
-import 'package:scanner_generator/Screens/GenerateQR.dart';
-import 'package:scanner_generator/Screens/GenerateBatchQR.dart';
 import 'package:scanner_generator/Screens/Settings.dart';
 import 'package:scanner_generator/Screens/UniversalScanner.dart';
 import 'package:scanner_generator/Utils/LanguageModifier.dart';
@@ -28,9 +19,7 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
-  final BarcodeConf conf = BarcodeConf();
-  
+class MyApp extends StatelessWidget {  
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ViewModifier>(
@@ -99,15 +88,9 @@ class MyApp extends StatelessWidget {
           home: Splash(),
           routes: {
             Dashboard.id: (context) => Dashboard(),
-            Settings.id: (context) => Settings(),
             UniversalScanner.id: (context) => UniversalScanner(),
-            ScanQR.id: (context) => ScanQR(),
             ScanImage.id: (context) => ScanImage(),
-            GenerateQR.id: (context) => GenerateQR(),
-            GenerateBatchQR.id: (context) => GenerateBatchQR(),
-            ScanBarcode.id: (context) => ScanBarcode(),
-            GenerateBarcode.id: (context) => GenerateBarcode(),
-            GenerateBatchBarcode.id: (context) => GenerateBatchBarcode(),
+            Settings.id: (context) => Settings(),
           },
         ),
       ),

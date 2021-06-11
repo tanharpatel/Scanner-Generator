@@ -4,6 +4,7 @@ import 'package:scanner_generator/Screens/Generator.dart';
 import 'package:scanner_generator/Screens/Scanner.dart';
 
 class ScannerGenerator extends StatefulWidget {
+  static final String id = "ScannerGenerator";
   final String codeType, codeId;
 
   ScannerGenerator({@required this.codeType, @required this.codeId});

@@ -22,11 +22,8 @@ class _ScannerState extends State<Scanner> {
   QRViewController controller;
   String codeResult;
   bool notType = false;
-  FToast ftoast;
 
   void _onQRViewCreated(QRViewController controller) {
-    ftoast = FToast();
-    ftoast.init(context);
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
       Vibration.vibrate(duration: 10);

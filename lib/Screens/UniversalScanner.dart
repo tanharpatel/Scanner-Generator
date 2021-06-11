@@ -6,7 +6,6 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:scanner_generator/Functions/launchURL.dart';
 import 'package:scanner_generator/Functions/showToast.dart';
 import 'package:share/share.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
 
 class UniversalScanner extends StatefulWidget {
@@ -19,11 +18,8 @@ class _UniversalScannerState extends State<UniversalScanner> {
   final GlobalKey key = GlobalKey(debugLabel: 'code');
   QRViewController controller;
   String codeResult, codeType;
-  FToast ftoast;
 
   void _onQRViewCreated(QRViewController controller) {
-    ftoast = FToast();
-    ftoast.init(context);
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
       Vibration.vibrate(duration: 10);

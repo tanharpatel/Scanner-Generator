@@ -2,19 +2,17 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
-import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:path/path.dart' as path;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:scanner_generator/Functions/fileExplorer.dart';
 import 'package:scanner_generator/Functions/showToast.dart';
 import 'package:share/share.dart';
 import 'package:vibration/vibration.dart';
@@ -32,11 +30,9 @@ class _GeneratorState extends State<Generator> {
   String  data = "", codeData = "";
   Uint8List bytes = Uint8List(0);
   TextEditingController textController = TextEditingController();
-  Directory downloadsDirectory, tempDir;
   bool isupcA = false;
   Barcode codeToGenerate;
   final pdf = pw.Document();
-  FToast ftoast;
 
   @override
   void initState() {
@@ -49,9 +45,7 @@ class _GeneratorState extends State<Generator> {
         isupcA = true;
       });
     }
-    ftoast = FToast();
-    ftoast.init(context);
-    initDownloadsDirectoryState();
+    initDownloadsDirectory();
   }
 
   @override
@@ -273,20 +267,6 @@ class _GeneratorState extends State<Generator> {
     );
   }
 
-  Future<void> initDownloadsDirectoryState() async {
-    // Directory downloadsDirectory;
-    try {
-      tempDir = await getTemporaryDirectory();
-      downloadsDirectory = await DownloadsPathProvider.downloadsDirectory;
-    } on PlatformException {
-      print('Could not get the downloads directory');
-    }
-    if (!mounted) return;
-    // setState(() async {
-    //   _downloadsDirectory = downloadsDirectory;
-    // });
-  }
-
   Future<Uint8List> toQrImageData(String text) async {
     try {
       final image = await QrPainter(
@@ -304,31 +284,6 @@ class _GeneratorState extends State<Generator> {
     }
   }
 
-  Future<void> _download(bool isShare, imgBytes) async {
-    var localPath;
-    if(isShare) {
-      localPath = path.join(tempDir.path, "$codeData-qrCode.jpg");
-    } else {
-      localPath = path.join(downloadsDirectory.path, "$codeData-qrCode.jpg");
-    }
-    final imageFile = File(localPath);
-    await imageFile.writeAsBytes(imgBytes);
-    
-    if(isShare) {
-      Share.shareFiles(['${tempDir.path}/$codeData-qrCode.jpg'], text: 'QR Code for $codeData');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("QR Code image saved under downloads folder!")));
-    }
-  }
-
-  // Future<void> _downloadCache(imgBytes) async {
-  //   print("share");
-  //   final localPath = path.join(tempDir.path, "$codeData-qrCode.jpg");
-  //   final imageFile = File(localPath);
-  //   await imageFile.writeAsBytes(imgBytes);
-  //   Share.shareFiles(['${tempDir.path}/$codeData-qrCode.jpg'], text: 'QR Code for $codeData');
-  // }
-
   void buildBarcode(
     bool isShare,
     Barcode code,
@@ -344,11 +299,28 @@ class _GeneratorState extends State<Generator> {
     );
 
     if(isShare) {
-      File('${tempDir.path}/$codeData-${widget.codeType.toLowerCase()}.svg').writeAsStringSync(await svg);
+      File('${tempDir.path}/$codeData-${widget.codeType}.svg').writeAsStringSync(await svg);
       Share.shareFiles(['${tempDir.path}/$codeData-${widget.codeType.toLowerCase()}.svg'], text: '${widget.codeType} for $codeData');
     } else {
-      File('${downloadsDirectory.path}/$codeData-${widget.codeType.toLowerCase()}.svg').writeAsStringSync(await svg);
+      File('${downloadsDirectory.path}/$codeData-${widget.codeType}.svg').writeAsStringSync(await svg);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Barcode image saved under downloads folder!")));
+    }
+  }
+
+  Future<void> _download(bool isShare, imgBytes) async {
+    var localPath;
+    if(isShare) {
+      localPath = path.join(tempDir.path, "$codeData-qrCode.jpg");
+    } else {
+      localPath = path.join(downloadsDirectory.path, "$codeData-qrCode.jpg");
+    }
+    final imageFile = File(localPath);
+    await imageFile.writeAsBytes(imgBytes);
+    
+    if(isShare) {
+      Share.shareFiles(['${tempDir.path}/$codeData-qrCode.jpg'], text: 'QR Code for $codeData');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("QR Code image saved under downloads folder!")));
     }
   }
 
@@ -379,47 +351,3 @@ class _GeneratorState extends State<Generator> {
     }
   }
 }
-
-
-// bottom sheet with padding
-// showModalBottomSheet(
-//   backgroundColor: Colors.transparent,
-//   context: context,
-//   builder: (context) {
-//     return BottomSheet(
-//       elevation: 20,
-//       enableDrag: false,
-//       backgroundColor: Colors.transparent,
-//       builder: (_) => Padding(
-//         padding: const EdgeInsets.all(10),
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             ListTile(
-//               leading: Icon(Icons.file_copy),
-//               title: Text("Download PDF"),
-//               onTap: () async {
-//                 Navigator.pop(context);
-//                 await savePdf();
-//               },
-//             ),
-//             ListTile(
-//               leading: Icon(Icons.image),
-//               title: Text("Download Image"),
-//               onTap: () async {
-//                 Navigator.pop(context);
-//                 if(isupcA) {
-//                   buildBarcode(false, codeToGenerate, codeData);
-//                 } else {
-//                   final img = await toQrImageData(codeData);
-//                   _download(false, img);
-//                 }
-//               }
-//             ),
-//           ],
-//         ),
-//       ),
-//       onClosing: () {},
-//     );
-//   }
-// );

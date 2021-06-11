@@ -1,14 +1,12 @@
 import 'dart:io';
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:excel/excel.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:scanner_generator/Functions/fileExplorer.dart';
 
 class GenerateFromFile extends StatefulWidget {
   static final String id = "GenerateFromFile";
@@ -21,8 +19,7 @@ class GenerateFromFile extends StatefulWidget {
 
 class _GenerateFromFileState extends State<GenerateFromFile> {
   List<String> names = [];
-  Directory downloadsDirectory;
-  String codeData = "", _path;
+  String codeData = "";
   bool _loadingFile = false;
   final pdf = pw.Document();
   Barcode codeToGenerate;
@@ -30,64 +27,13 @@ class _GenerateFromFileState extends State<GenerateFromFile> {
   @override
   void initState() {
     super.initState();
+    path = null;
     if(widget.codeId == "qrCode") {
       codeToGenerate = Barcode.qrCode();
     } else if (widget.codeId == "upcA") {
       codeToGenerate = Barcode.upcA();
     }
-    initDownloadsDirectoryState();
-  }
-
-  Future<void> initDownloadsDirectoryState() async {
-    // Directory downloadsDirectory;
-    try {
-      downloadsDirectory = await DownloadsPathProvider.downloadsDirectory;
-    } on PlatformException {
-      print('Could not get the downloads directory');
-    }
-    if (!mounted) return;
-    // setState(() {
-    //   _downloadsDirectory = downloadsDirectory;
-    // });
-  }
-
-  void _openFileExplorer() async {
-    names = [];
-    setState(() {
-      _loadingFile = true;
-    });
-    try{
-      FilePickerResult result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
-        type: FileType.custom,
-        allowedExtensions: ['xlsx', 'csv'],
-      );
-      if(result != null) {
-        _path = result.files.single.path;
-      }
-    } on PlatformException catch(e) {
-      print(e);
-    }
-    if(!mounted) return;
-    setState(() {
-      _loadingFile = false;
-    });
-
-    //  for opening a file from specified location
-    var bytes = File(_path).readAsBytesSync();
-    // for opening file from assets folder
-    // ByteData data = await rootBundle.load(_path);
-    // var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    var excel = Excel.decodeBytes(bytes);
-    for (var table in excel.tables.keys) {
-      for (int row = 0; row < excel.tables[table].maxRows; row++) {
-        excel.tables[table].row(row).forEach((cell) {
-          var val = cell.value;
-          names.add(val.toString());
-        });
-      }
-    }
-    print(names);
+    initDownloadsDirectory();
   }
 
   @override
@@ -103,13 +49,31 @@ class _GenerateFromFileState extends State<GenerateFromFile> {
               RaisedButton(
                 child: Text("Get Excel"),
                 onPressed: () async {
-                  _openFileExplorer();
+                  path = "";
+                  names = [];
+                  setState(() {
+                    _loadingFile = true;
+                  });
+                  await openFileExplorer(['xlsx', 'csv']);
+                  setState(() {
+                    _loadingFile = false;
+                  });
+                  var bytes = File(path).readAsBytesSync();
+                  var excel = Excel.decodeBytes(bytes);
+                  for (var table in excel.tables.keys) {
+                    for (int row = 0; row < excel.tables[table].maxRows; row++) {
+                      excel.tables[table].row(row).forEach((cell) {
+                        var val = cell.value;
+                        names.add(val.toString());
+                      });
+                    }
+                  }
                 },
               ),
               Builder(
                 builder: (BuildContext context) => _loadingFile
                   ? const CircularProgressIndicator()
-                  : _path != null
+                  : path != null
                     ? Expanded(
                       child: Container(
                         padding: const EdgeInsets.only(top: 15),
@@ -153,25 +117,6 @@ class _GenerateFromFileState extends State<GenerateFromFile> {
   }
 
   printPdf() async {
-    // pdf.addPage(pw.MultiPage(
-    //   pageFormat: PdfPageFormat(500, 500),
-    //   build: (pw.Context context) => [
-    //   pw.ListView.builder(
-    //     itemCount: names.length,
-    //     itemBuilder: (context, index) {
-    //       return pw.Center(
-    //         child: pw.BarcodeWidget(
-    //           data: names[index],
-    //           width: 400,
-    //           height: 400,
-    //           barcode: codeToGenerate,
-    //           drawText: true,
-    //         ),
-    //       );
-    //     },
-    //   )
-    // ]));
-
     List<String> even = [];
     List<String> odd = [];
     
@@ -186,9 +131,7 @@ class _GenerateFromFileState extends State<GenerateFromFile> {
         odd.add(names[i]);
       }
     }
-    print(even);
-    print(odd);
-
+    
     pdf.addPage(pw.MultiPage(
       // pageFormat: PdfPageFormat(500, 500),
       // pageFormat: PdfPageFormat.a4,
@@ -239,8 +182,7 @@ class _GenerateFromFileState extends State<GenerateFromFile> {
 
   Future savePdf() async {
     if (await Permission.storage.request().isGranted) {
-      File file = File("${downloadsDirectory.path}/${widget.codeType}.pdf");
-      file.writeAsBytesSync(await pdf.save());
+      File("${downloadsDirectory.path}/${widget.codeType}.pdf").writeAsBytesSync(await pdf.save());
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("PDF saved under downloads folder as ${widget.codeType}.pdf")));
     }
   }

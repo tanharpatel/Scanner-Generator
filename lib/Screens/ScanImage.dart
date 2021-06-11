@@ -1,17 +1,12 @@
 import 'dart:io';
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:downloads_path_provider/downloads_path_provider.dart';
-import 'package:excel/excel.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:pdf/pdf.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:pdf/widgets.dart' as pw;
 import 'package:qr_code_tools/qr_code_tools.dart';
 import 'package:scanner_generator/Functions/launchURL.dart';
+import 'package:scanner_generator/Functions/fileExplorer.dart';
 import 'package:scanner_generator/Functions/showToast.dart';
 import 'package:share/share.dart';
 
@@ -22,37 +17,14 @@ class ScanImage extends StatefulWidget {
 }
 
 class _ScanImageState extends State<ScanImage> {
-  String codeResult, _path;
+  String codeResult;
   bool _loadingFile = false, notValid = false;
   Barcode codeToGenerate;
 
-  void _openFileExplorer() async {
-    setState(() {
-      _loadingFile = true;
-    });
-    try{
-      FilePickerResult result = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'jpeg', 'png'],
-      );
-      if(result != null) {
-        _path = result.files.single.path;
-      }
-    } on PlatformException catch(e) {
-      print(e);
-    }
-    if(!mounted) return;
-    setState(() {
-      _loadingFile = false;
-    });
-
-    var bytes = File(_path).readAsBytesSync();
-    //TODO: do code to scan the obtained image stored as bytes
-    print("bytes");
-    // _getQrByGallery();
-    decode(_path);
-    print(bytes);
+  @override
+  void initState() {
+    path = null;
+    super.initState();
   }
 
   @override
@@ -68,18 +40,25 @@ class _ScanImageState extends State<ScanImage> {
               RaisedButton(
                 child: Text("Get Image"),
                 onPressed: () async {
-                  _openFileExplorer();
+                  setState(() {
+                    _loadingFile = true;
+                  });
+                  await openFileExplorer(['jpg', 'jpeg', 'png']);
+                  setState(() {
+                    _loadingFile = false;
+                  });
+                  decode(path);
                 },
               ),
               Builder(
                 builder: (BuildContext context) => _loadingFile
                   ? const CircularProgressIndicator()
-                  : _path != null
+                  : path != null
                     ? Column(
                       children: [
                         SizedBox(
                           height: MediaQuery.of(context).size.height*0.5,
-                          child: Image.file(File(_path))
+                          child: Image.file(File(path))
                         ),
                         Scrollbar(
                           isAlwaysShown: true,
