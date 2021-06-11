@@ -21,7 +21,7 @@ class _ScannerState extends State<Scanner> {
   final GlobalKey key = GlobalKey(debugLabel: 'code');
   QRViewController controller;
   String codeResult;
-  bool notType = false;
+  bool notType = false, pause = false, flashOn = false;
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
@@ -70,7 +70,7 @@ class _ScannerState extends State<Scanner> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                flex: 2,
+                flex: 4,
                 child: QRView(
                   key: key,
                   onQRViewCreated: _onQRViewCreated,
@@ -78,6 +78,38 @@ class _ScannerState extends State<Scanner> {
               ),
               Expanded(
                 flex: 1,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.flip_camera_ios_rounded),
+                      onPressed: () async => await controller.flipCamera()
+                    ),
+                    IconButton(
+                      icon: flashOn ? Icon(Icons.flash_off_rounded) : Icon(Icons.flash_on_rounded),
+                      onPressed: () async {
+                        await controller.toggleFlash();
+                        setState(() {
+                          flashOn = !flashOn;
+                        });
+                      }
+                    ),
+                    IconButton(
+                      icon: pause ? Icon(Icons.play_arrow_rounded) : Icon(Icons.pause_rounded),
+                      onPressed: () async {
+                        if(pause) await controller.resumeCamera();
+                        else await controller.pauseCamera();
+                        setState(() {
+                          pause = !pause;
+                        });
+                      }
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 2,
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 5),
@@ -102,17 +134,17 @@ class _ScannerState extends State<Scanner> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.share),
+                                      icon: Icon(Icons.share_rounded),
                                       onPressed: () {
                                         Share.share("Data scanned is: $codeResult");
                                       }
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.open_in_new),
+                                      icon: Icon(Icons.open_in_new_rounded),
                                       onPressed: () async => launchURL(context, codeResult)
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.copy),
+                                      icon: Icon(Icons.copy_rounded),
                                       onPressed: () async {
                                         await Clipboard.setData(ClipboardData(text: codeResult));
                                         showToast(context,

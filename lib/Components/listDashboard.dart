@@ -11,9 +11,9 @@ listDashboard(BuildContext context) {
     children: [
       rightListCard(FontAwesomeIcons.questionCircle, "Don't know type of Code", context, UniversalScanner()),
       leftListCard(FontAwesomeIcons.image, "Scan Code from Image", context, ScanImage()),
-      rightListCard(Icons.qr_code, "QR Code", context, ScannerGenerator(codeType: "QR Code", codeId: "qrcode")),
+      rightListCard(Icons.qr_code_rounded, "QR Code", context, ScannerGenerator(codeType: "QR Code", codeId: "qrcode")),
       leftListCard(FontAwesomeIcons.barcode, "Barcode", context, ScannerGenerator(codeId: "upcA", codeType: "Barcode")),
-      rightListCard(FontAwesomeIcons.barcode, "Generate QR Code and Save to PDF", context, GenerateFromFile(codeId: "qrCode", codeType: "QR Code")),
+      rightListCard(Icons.qr_code_rounded, "Generate QR Code and Save to PDF", context, GenerateFromFile(codeId: "qrCode", codeType: "QR Code")),
       leftListCard(FontAwesomeIcons.barcode, "Generate Barcode and Save to PDF", context, GenerateFromFile(codeId: "upcA", codeType: "Barcode")),
     ],
   );

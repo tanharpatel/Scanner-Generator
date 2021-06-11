@@ -19,14 +19,14 @@ gridDashboard(BuildContext context) {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          gridCard(Icons.qr_code, "QR Code", context, ScannerGenerator(codeType: "QR Code", codeId: "qrcode")),
+          gridCard(Icons.qr_code_rounded, "QR Code", context, ScannerGenerator(codeType: "QR Code", codeId: "qrcode")),
           gridCard(FontAwesomeIcons.barcode, "Barcode", context, ScannerGenerator(codeId: "upcA", codeType: "Barcode")),
         ],
       ),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          gridCard(FontAwesomeIcons.barcode, "Generate QR Code and Save to PDF", context, GenerateFromFile(codeId: "qrCode", codeType: "QR Code")),
+          gridCard(Icons.qr_code_rounded, "Generate QR Code and Save to PDF", context, GenerateFromFile(codeId: "qrCode", codeType: "QR Code")),
           gridCard(FontAwesomeIcons.barcode, "Generate Barcode and Save to PDF", context, GenerateFromFile(codeId: "upcA", codeType: "Barcode")),
         ],
       ),

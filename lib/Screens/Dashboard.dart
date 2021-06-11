@@ -59,7 +59,7 @@ class _DashboardState extends State<Dashboard> {
               Positioned(
                 top: 10, right: 10,
                 child: IconButton(
-                  icon: Icon(Icons.settings, color: Colors.white),
+                  icon: Icon(Icons.settings_rounded, color: Colors.white),
                   onPressed: () {
                     Navigator.pushNamed(context, Settings.id);
                   }

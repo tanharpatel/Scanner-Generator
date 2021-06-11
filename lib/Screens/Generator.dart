@@ -140,7 +140,7 @@ class _GeneratorState extends State<Generator> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Icon(Icons.verified_user, size: 18, color: Colors.green),
+                Icon(Icons.verified_user_rounded, size: 18, color: Colors.green),
                 Text('  Generated ${widget.codeType}', style: Theme.of(context).textTheme.bodyText1),
               ],
             ),
@@ -197,7 +197,7 @@ class _GeneratorState extends State<Generator> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ListTile(
-                              leading: Icon(Icons.file_copy),
+                              leading: Icon(Icons.picture_as_pdf_rounded),
                               title: Text("Share PDF"),
                               onTap: () async {
                                 Navigator.pop(context);
@@ -205,7 +205,7 @@ class _GeneratorState extends State<Generator> {
                               },
                             ),
                             ListTile(
-                              leading: Icon(Icons.image),
+                              leading: Icon(Icons.image_rounded),
                               title: Text("Share Image"),
                               onTap: () async {
                                 Navigator.pop(context);
@@ -241,7 +241,7 @@ class _GeneratorState extends State<Generator> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ListTile(
-                              leading: Icon(Icons.file_copy),
+                              leading: Icon(Icons.picture_as_pdf_rounded),
                               title: Text("Download PDF"),
                               onTap: () async {
                                 Navigator.pop(context);
@@ -249,7 +249,7 @@ class _GeneratorState extends State<Generator> {
                               },
                             ),
                             ListTile(
-                              leading: Icon(Icons.image),
+                              leading: Icon(Icons.image_rounded),
                               title: Text("Download Image"),
                               onTap: () async {
                                 Navigator.pop(context);

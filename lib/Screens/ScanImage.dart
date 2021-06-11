@@ -81,17 +81,17 @@ class _ScanImageState extends State<ScanImage> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         IconButton(
-                                          icon: Icon(Icons.share),
+                                          icon: Icon(Icons.share_rounded),
                                           onPressed: () {
                                             Share.share("Data scanned is: $codeResult");
                                           }
                                         ),
                                         IconButton(
-                                          icon: Icon(Icons.open_in_new),
+                                          icon: Icon(Icons.open_in_new_rounded),
                                           onPressed: () async => launchURL(context, codeResult)
                                         ),
                                         IconButton(
-                                          icon: Icon(Icons.copy),
+                                          icon: Icon(Icons.copy_rounded),
                                           onPressed: () async {
                                             await Clipboard.setData(ClipboardData(text: codeResult));
                                             showToast(context,

@@ -44,9 +44,9 @@ class _SettingsState extends State<Settings> {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: Icon(Icons.brightness_high),
+                        leading: Icon(Icons.brightness_high_rounded),
                         title: Text("Light Theme"),
-                        trailing: _theme == ThemeMode.light ? Icon(Icons.radio_button_checked) : Icon(Icons.radio_button_off),
+                        trailing: _theme == ThemeMode.light ? Icon(Icons.radio_button_checked_rounded) : Icon(Icons.radio_button_off_rounded),
                         onTap: () {
                           setState(() {
                             _theme = ThemeMode.light;
@@ -55,9 +55,9 @@ class _SettingsState extends State<Settings> {
                         },
                       ),
                       ListTile(
-                        leading: Icon(Icons.brightness_low),
+                        leading: Icon(Icons.brightness_low_rounded),
                         title: Text("Dark Theme"),
-                        trailing: _theme == ThemeMode.dark ? Icon(Icons.radio_button_checked) : Icon(Icons.radio_button_off),
+                        trailing: _theme == ThemeMode.dark ? Icon(Icons.radio_button_checked_rounded) : Icon(Icons.radio_button_off_rounded),
                         onTap: () {
                           setState(() {
                             _theme = ThemeMode.dark;
@@ -66,9 +66,9 @@ class _SettingsState extends State<Settings> {
                         },
                       ),
                       ListTile(
-                        leading: Icon(Icons.brightness_auto),
+                        leading: Icon(Icons.brightness_auto_rounded),
                         title: Text("System"),
-                        trailing: _theme == ThemeMode.system ? Icon(Icons.radio_button_checked) : Icon(Icons.radio_button_off),
+                        trailing: _theme == ThemeMode.system ? Icon(Icons.radio_button_checked_rounded) : Icon(Icons.radio_button_off_rounded),
                         onTap: () {
                           setState(() {
                             _theme = ThemeMode.system;
@@ -93,9 +93,9 @@ class _SettingsState extends State<Settings> {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: Icon(Icons.list),
+                        leading: Icon(Icons.list_rounded),
                         title: Text("List View"),
-                        trailing: _view == ViewType.List ? Icon(Icons.radio_button_checked) : Icon(Icons.radio_button_off),
+                        trailing: _view == ViewType.List ? Icon(Icons.radio_button_checked_rounded) : Icon(Icons.radio_button_off_rounded),
                         onTap: () {
                           setState(() {
                             _view = ViewType.List;
@@ -106,7 +106,7 @@ class _SettingsState extends State<Settings> {
                       ListTile(
                         leading: Icon(Icons.grid_view),
                         title: Text("Grid View"),
-                        trailing: _view == ViewType.Grid ? Icon(Icons.radio_button_checked) : Icon(Icons.radio_button_off),
+                        trailing: _view == ViewType.Grid ? Icon(Icons.radio_button_checked_rounded) : Icon(Icons.radio_button_off_rounded),
                         onTap: () {
                           setState(() {
                             _view = ViewType.Grid;
@@ -133,7 +133,7 @@ class _SettingsState extends State<Settings> {
                       ListTile(
                         leading: Icon(FontAwesomeIcons.language),
                         title: Text("English"),
-                        trailing: _lang == Language.English ? Icon(Icons.radio_button_checked) : Icon(Icons.radio_button_off),
+                        trailing: _lang == Language.English ? Icon(Icons.radio_button_checked_rounded) : Icon(Icons.radio_button_off_rounded),
                         onTap: () {
                           setState(() {
                             _lang = Language.English;
@@ -144,7 +144,7 @@ class _SettingsState extends State<Settings> {
                       ListTile(
                         leading: Icon(FontAwesomeIcons.language),
                         title: Text("Hindi"),
-                        trailing: _lang == Language.Hindi ? Icon(Icons.radio_button_checked) : Icon(Icons.radio_button_off),
+                        trailing: _lang == Language.Hindi ? Icon(Icons.radio_button_checked_rounded) : Icon(Icons.radio_button_off_rounded),
                         onTap: () {
                           setState(() {
                             _lang = Language.Hindi;
@@ -155,7 +155,7 @@ class _SettingsState extends State<Settings> {
                       ListTile(
                         leading: Icon(FontAwesomeIcons.language),
                         title: Text("Gujarati"),
-                        trailing: _lang == Language.Gujarati ? Icon(Icons.radio_button_checked) : Icon(Icons.radio_button_off),
+                        trailing: _lang == Language.Gujarati ? Icon(Icons.radio_button_checked_rounded) : Icon(Icons.radio_button_off_rounded),
                         onTap: () {
                           setState(() {
                             _lang = Language.Gujarati;

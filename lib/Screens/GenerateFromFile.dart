@@ -91,7 +91,7 @@ class _GenerateFromFileState extends State<GenerateFromFile> {
                                     child: BarcodeWidget(barcode: codeToGenerate, data: names[index]),
                                   ),
                                   Text((names[index]).toString()),
-                                  IconButton(icon: Icon(Icons.share,), onPressed: (){print(names[index]);}),
+                                  IconButton(icon: Icon(Icons.share_rounded,), onPressed: (){print(names[index]);}),
                                 ]
                               );
                             }

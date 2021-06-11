@@ -18,6 +18,7 @@ class _UniversalScannerState extends State<UniversalScanner> {
   final GlobalKey key = GlobalKey(debugLabel: 'code');
   QRViewController controller;
   String codeResult, codeType;
+  bool pause = false, flashOn = false;
 
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
@@ -62,10 +63,42 @@ class _UniversalScannerState extends State<UniversalScanner> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: QRView(
                     key: key,
                     onQRViewCreated: _onQRViewCreated,
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.flip_camera_ios_rounded),
+                        onPressed: () async => await controller.flipCamera()
+                      ),
+                      IconButton(
+                        icon: flashOn ? Icon(Icons.flash_off_rounded) : Icon(Icons.flash_on_rounded),
+                        onPressed: () async {
+                          await controller.toggleFlash();
+                          setState(() {
+                            flashOn = !flashOn;
+                          });
+                        }
+                      ),
+                      IconButton(
+                        icon: pause ? Icon(Icons.play_arrow_rounded) : Icon(Icons.pause_rounded),
+                        onPressed: () async {
+                          if(pause) await controller.resumeCamera();
+                          else await controller.pauseCamera();
+                          setState(() {
+                            pause = !pause;
+                          });
+                        }
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -114,17 +147,17 @@ class _UniversalScannerState extends State<UniversalScanner> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        icon: Icon(Icons.share),
+                                        icon: Icon(Icons.share_rounded),
                                         onPressed: () {
                                           Share.share("Data scanned is: $codeResult");
                                         }
                                       ),
                                       IconButton(
-                                        icon: Icon(Icons.open_in_new),
+                                        icon: Icon(Icons.open_in_new_rounded),
                                         onPressed: () async => launchURL(context, codeResult)
                                       ),
                                       IconButton(
-                                        icon: Icon(Icons.copy),
+                                        icon: Icon(Icons.copy_rounded),
                                         onPressed: () async {
                                           await Clipboard.setData(ClipboardData(text: codeResult));
                                           showToast(context,
