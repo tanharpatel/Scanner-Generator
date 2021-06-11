@@ -1,0 +1,51 @@
+name: scanner_generator
+description: A new Flutter project.
+
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+ 
+  cupertino_icons: ^1.0.2
+  excel:
+  path_provider:
+  downloads_path_provider:
+  qr_flutter:
+  barcode:
+  flutter_svg:
+  qr_code_scanner:
+  pdf:
+  # barcode_image:
+  # barcode_widget:
+  # file_selector:
+  file_picker:
+  permission_handler:
+  # qrscan:
+  image_picker:
+  image_gallery_saver:
+  share:
+  barcode_widget:
+  font_awesome_flutter:
+  flutter_spinkit:
+  vibration:
+  fluttertoast:
+  url_launcher:
+  provider:
+  shared_preferences:
+  qr_code_tools:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:  
+  uses-material-design: true
+
+  assets:
+    - assets/
