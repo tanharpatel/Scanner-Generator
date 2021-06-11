@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'dart:ui' as ui;
+import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +15,7 @@ import 'package:path/path.dart' as path;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:scanner_generator/Functions/fileExplorer.dart';
+import 'package:scanner_generator/Functions/saveShareFile.dart';
 import 'package:scanner_generator/Functions/showToast.dart';
 import 'package:share/share.dart';
 import 'package:vibration/vibration.dart';
@@ -33,6 +36,7 @@ class _GeneratorState extends State<Generator> {
   bool isupcA = false;
   Barcode codeToGenerate;
   final pdf = pw.Document();
+  final GlobalKey globalKey = GlobalKey();
 
   @override
   void initState() {
@@ -87,16 +91,30 @@ class _GeneratorState extends State<Generator> {
                 child: Center(
                   child: RaisedButton(
                     onPressed: () async {
-                      if(data.length == 12) {
-                        setState(() { codeData = data; });
+                      if(isupcA) {
+                        if(data.length == 12) {
+                          setState(() { codeData = data; });
+                        } else {
+                          Vibration.vibrate(duration: 10);
+                          showToast(context,
+                            "Data can't be empty",
+                            ToastGravity.TOP,
+                            Colors.red,
+                            Duration(seconds: 2)
+                          );
+                        }
                       } else {
-                        Vibration.vibrate(duration: 10);
-                        showToast(context,
-                          "Data can't be empty",
-                          ToastGravity.TOP,
-                          Colors.red,
-                          Duration(seconds: 2)
-                        );
+                        if(data.length != 0) {
+                          setState(() { codeData = data; });
+                        } else {
+                          Vibration.vibrate(duration: 10);
+                          showToast(context,
+                            "Data can't be empty",
+                            ToastGravity.TOP,
+                            Colors.red,
+                            Duration(seconds: 2)
+                          );
+                        }
                       }
                     },
                     child: Text("Generate"),
@@ -143,10 +161,13 @@ class _GeneratorState extends State<Generator> {
                     ? Center(child: Text('Enter text to generate Code...'))
                     : Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: BarcodeWidget(
-                        barcode: codeToGenerate,
-                        data: codeData,
-                        color: Theme.of(context).iconTheme.color,
+                      child: RepaintBoundary(
+                        key: globalKey,
+                        child: BarcodeWidget(
+                          barcode: codeToGenerate,
+                          data: codeData,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                       ),
                     )
                 ),
@@ -188,12 +209,8 @@ class _GeneratorState extends State<Generator> {
                               title: Text("Share Image"),
                               onTap: () async {
                                 Navigator.pop(context);
-                                if(isupcA) {
-                                  buildBarcode(true, codeToGenerate, codeData);
-                                } else {
-                                  final img = await toQrImageData(codeData);
-                                  await _download(true, img);
-                                }
+                                await saveShareJpg(true);
+                                textController.clear();
                               }
                             ),
                           ],
@@ -236,12 +253,7 @@ class _GeneratorState extends State<Generator> {
                               title: Text("Download Image"),
                               onTap: () async {
                                 Navigator.pop(context);
-                                if(isupcA) {
-                                  buildBarcode(false, codeToGenerate, codeData);
-                                } else {
-                                  final img = await toQrImageData(codeData);
-                                  _download(false, img);
-                                }
+                                await saveShareJpg(false);
                               }
                             ),
                           ],
@@ -257,8 +269,10 @@ class _GeneratorState extends State<Generator> {
           TextButton(
             onPressed: () {
               setState(() {
-                codeData = ""; textController.text = "";
+                codeData = "";
+                data = "";
               });
+              textController.clear();
             },
             child: Text("Discard", style: TextStyle(color: Colors.grey)),
           ),
@@ -267,61 +281,19 @@ class _GeneratorState extends State<Generator> {
     );
   }
 
-  Future<Uint8List> toQrImageData(String text) async {
-    try {
-      final image = await QrPainter(
-        data: text,
-        gapless: false,
-        color: Colors.black,
-        emptyColor: Colors.white,
-        version: QrVersions.auto,
-      ).toImage(300);
-      final a = await image.toByteData(format: ImageByteFormat.png);
-      return a.buffer.asUint8List();
-    } catch (e) {
-      print("not saved to gallery");
-      throw e;
-    }
-  }
+  saveShareJpg(bool isShare) async {
+    final RenderRepaintBoundary boundary = globalKey.currentContext.findRenderObject(); 
+    final ui.Image image = await boundary.toImage();
+    dynamic bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    bytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
 
-  void buildBarcode(
-    bool isShare,
-    Barcode code,
-    String data, {
-    String filename,
-    double width,
-    double height,
-  }) async {
-    final svg = code.toSvg(
-      data,
-      width: width ?? 200,
-      height: height ?? 80,
+    saveSharefile(context,
+      isShare,
+      codeData,
+      widget.codeType,
+      "jpg",
+      bytes
     );
-
-    if(isShare) {
-      File('${tempDir.path}/$codeData-${widget.codeType}.svg').writeAsStringSync(await svg);
-      Share.shareFiles(['${tempDir.path}/$codeData-${widget.codeType.toLowerCase()}.svg'], text: '${widget.codeType} for $codeData');
-    } else {
-      File('${downloadsDirectory.path}/$codeData-${widget.codeType}.svg').writeAsStringSync(await svg);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Barcode image saved under downloads folder!")));
-    }
-  }
-
-  Future<void> _download(bool isShare, imgBytes) async {
-    var localPath;
-    if(isShare) {
-      localPath = path.join(tempDir.path, "$codeData-qrCode.jpg");
-    } else {
-      localPath = path.join(downloadsDirectory.path, "$codeData-qrCode.jpg");
-    }
-    final imageFile = File(localPath);
-    await imageFile.writeAsBytes(imgBytes);
-    
-    if(isShare) {
-      Share.shareFiles(['${tempDir.path}/$codeData-qrCode.jpg'], text: 'QR Code for $codeData');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("QR Code image saved under downloads folder!")));
-    }
   }
 
   saveSharePdf(bool isShare) async {
@@ -340,14 +312,12 @@ class _GeneratorState extends State<Generator> {
       }
     ));
 
-    if (await Permission.storage.request().isGranted) {
-      if(isShare) {
-        File("${tempDir.path}/$codeData-${widget.codeType}.pdf").writeAsBytesSync(await pdf.save());
-        Share.shareFiles(['${tempDir.path}/$codeData-${widget.codeType}.pdf'], text: '${widget.codeType} for $codeData'); 
-      } else {
-        File("${downloadsDirectory.path}/$codeData-${widget.codeType}.pdf").writeAsBytesSync(await pdf.save());
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("PDF saved under downloads folder as $codeData-${widget.codeType}.pdf")));
-      }
-    }
+    saveSharefile(context,
+      isShare,
+      codeData,
+      widget.codeType,
+      "pdf",
+      await pdf.save()
+    );
   }
 }
